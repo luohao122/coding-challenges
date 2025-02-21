@@ -101,10 +101,10 @@ Recommended approach for real-time performance: **WebSockets** or **SSE**.
 
 ```mermaid
 flowchart LR
-    A((User Action)) --> B(API POST /scoreboard/increment)
-    B -->|Valid Auth| C[Server: Validate Request]
-    C -->|Increment Score| D[Database: Update Score]
-    D --> E[Publish Update to Clients (WebSocket/SSE)]
+    A((User Action)) --> B([API POST /scoreboard/increment])
+    B -->|Valid Auth| C([Server: Validate Request])
+    C -->|Increment Score| D([Database: Update Score])
+    D --> E([Publish Update to Clients via WebSockets or SSE])
     E --> F((Browser Clients))
     F -->|Update UI| F
 ```
