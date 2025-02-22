@@ -1,8 +1,8 @@
-# vue3-taskman
+# vue3-token-swap
 
-## About Taskman
+## About Swappy
 
-Taskman is a Vue 3-based task management application that demonstrates modern web development practices using Vite, Tailwind CSS, Pinia, and json-server. It features CRUD operations and allows users to manage tasks, filter and search them, and adjust global settings such as dark mode and server sync.
+Swappy is a Vue 3-based token swap management application that demonstrates modern web development practices using Vite, Tailwind CSS, Pinia, and json-server. It allows users to manage their token swaps and adjust global settings such as dark mode.
 
 ---
 
@@ -92,19 +92,13 @@ I am an engineer with over 10 years of experience who loves coding, mentoring yo
 
 ---
 
-## Pinia Plugin
-
-This app uses a custom localStorage plugin for Pinia that persists store data to localStorage. The plugin checks for existing data on initialization and subscribes to store changes to update localStorage accordingly.
-
----
-
 ## Pinia Stores
 
-- **taskStore:**  
-  Manages the tasks data including CRUD operations. It handles fetching tasks from json-server (or localStorage in offline mode), creating new tasks, updating, and deleting tasks.
+- **tokenPrices:**  
+  Manages the token prices data. It handles fetching the price of tokens from json-server.
 
 - **settingsStore:**  
-  Manages global application settings such as dark mode and whether to sync with the server (online mode). These settings are used throughout the app to control UI themes and API interactions.
+  Manages global application settings such as dark mode. The setting are used throughout the app to control UI themes.
 
 ---
 
@@ -113,5 +107,3 @@ This app uses a custom localStorage plugin for Pinia that persists store data to
 - **Database:**  
   Ensure that you have a `db.json` file in the project root. Refer to the provided `db.example.json` for the structure. The app expects json-server to be running (`npx json-server db.json`) before launching the Vue application.
 
-- **Syncing and Offline Mode:**  
-  The app supports offline mode, where tasks are saved to localStorage. When online mode is enabled, it syncs with the json-server API.
