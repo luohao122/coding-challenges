@@ -1,0 +1,5 @@
+[
+  { "currency": "ATOM", "date": "2023-08-29T07:10:40.000Z", "price": 10 },
+  { "currency": "ETH",  "date": "2023-08-29T07:10:40.000Z", "price": 2000 },
+  { "currency": "USDC", "date": "2023-08-29T07:10:40.000Z", "price": 1 }
+]

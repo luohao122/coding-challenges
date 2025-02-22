@@ -9,7 +9,7 @@ describe('Footer', () => {
     const footerLeft = wrapper.find('div#footer-left')
 
     expect(footerLeft.exists()).toBe(true)
-    expect(footerLeft.text()).toContain('Taskman')
+    expect(footerLeft.text()).toContain('Swappy')
   })
 
   it('should renders the copyright section of the footer', () => {

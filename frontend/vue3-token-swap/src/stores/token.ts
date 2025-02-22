@@ -6,7 +6,7 @@ import type { TokenPrice } from '@/types/token'
 
 export const useTokenPriceStore = defineStore('tokenPrices', () => {
   const isLoading = ref<boolean>(false)
-  const error = ref(null)
+  const error = ref<null | string>(null)
   const tokenPrices = ref<TokenPrice[]>([])
   const { addNotification } = useNotification()
 
@@ -16,6 +16,7 @@ export const useTokenPriceStore = defineStore('tokenPrices', () => {
     try {
       const response = await fetch('http://localhost:3000/tokenPrices')
       if (!response.ok) {
+        error.value = 'Failed to fetch token prices!'
         addNotification({ message: 'Failed to fetch token prices!', type: 'danger' })
         console.error('Failed to fetch token prices!')
         return

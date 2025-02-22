@@ -8,8 +8,22 @@
       </p>
     </div>
 
+    <!-- Loading Skeleton -->
+    <template v-if="tokenPriceStore.isLoading">
+      <LoadingSkeleton />
+    </template>
+
+    <!-- Error Card -->
+    <template v-if="!tokenPriceStore.isLoading && tokenPriceStore.error">
+      <ErrorCard>Could not load token prices at the moment.</ErrorCard>
+    </template>
+
     <!-- Swap Form -->
-    <SwapForm :currencies="availableCurrencies" @swapConfirmed="handleSwap" />
+    <SwapForm
+      v-if="!tokenPriceStore.isLoading && tokenPriceStore.tokenPrices.length > 0"
+      :currencies="availableCurrencies"
+      @swapConfirmed="handleSwap"
+    />
 
     <!-- Display each completed swap -->
     <SwapList :swaps="swapStore.swapRecords" />
@@ -17,13 +31,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useTokenPriceStore } from '@/stores/token'
 
 import SwapForm from '@/components/form/SwapForm.vue'
 import SwapList from '@/components/ui/SwapList/SwapList.vue'
 import type { SwapRecord } from '@/types/token'
+
 import { useSwapStore } from '@/stores/swap-store'
+import LoadingSkeleton from '@/components/ui/LoadingSkeleton/LoadingSkeleton.vue'
+import ErrorCard from '@/components/ui/ErrorCard/ErrorCard.vue'
 
 const tokenPriceStore = useTokenPriceStore()
 const swapStore = useSwapStore()

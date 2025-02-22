@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-md mb-2">
+  <div data-cy="swap-item" class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-md mb-2">
     <!-- FROM side -->
     <div class="flex items-center space-x-2">
       <img

@@ -14,11 +14,11 @@ describe('Header', () => {
         },
       },
     })
-    // Find a RouterLink component and check that it contains "Taskman"
+    // Find a RouterLink component and check that it contains "Swappy"
     // using a CSS selector:
     const logoLink = wrapper.find('a.router-link')
     expect(logoLink.exists()).toBe(true)
-    expect(logoLink.text()).toContain('Taskman')
+    expect(logoLink.text()).toContain('Swappy')
   })
 
   it('toggles mobile menu when hamburger button is clicked', async () => {

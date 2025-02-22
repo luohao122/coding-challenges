@@ -20,6 +20,6 @@ describe('Settings', () => {
     })
     expect(wrapper.text()).toContain('Settings')
     const toggles = wrapper.findAll('input[type="checkbox"]')
-    expect(toggles.length).toBe(2)
+    expect(toggles.length).toBe(1)
   })
 })

@@ -1,87 +1,74 @@
-describe('Home Page', () => {
+// cypress/e2e/HomeView.cy.ts
+describe('HomeView E2E Flow', () => {
   beforeEach(() => {
-    // Open the home page
-    cy.visit('/')
+    // Intercept the fetch to the tokenPrices endpoint
+    cy.intercept('GET', 'http://localhost:3000/tokenPrices', {
+      fixture: 'tokenPrices.json',
+    }).as('getTokenPrices')
+
+    // Visit the root path (assuming your dev server runs on localhost:4173 or similar)
+    cy.visit('http://localhost:4173/')
   })
 
-  it('displays header text and category cards', () => {
-    cy.contains('Plan Your Day, Conquer Your Tasks').should('be.visible')
-    // Verify each category is visible:
-    cy.contains('All').should('be.visible')
-    cy.contains('Completed').should('be.visible')
-    cy.contains('High').should('be.visible')
-    cy.contains('Medium').should('be.visible')
-    cy.contains('Low').should('be.visible')
+  it('displays loading skeleton then shows swap form once data is loaded', () => {
+    // 1. Initially, we expect the loading skeleton to be visible
+    cy.get('[data-cy="loading-skeleton"]').should('be.visible')
+
+    // 2. Wait for the token prices request to complete
+    cy.wait('@getTokenPrices')
+
+    // 3. The skeleton should now be gone, and the swap form should appear
+    cy.get('form').should('be.visible') // swap form
+
+    // The from/to currency selects should contain the tokens from `tokenPrices.json`
+    // e.g. if your fixture has ["ATOM", "ETH", "USDC"], check that the selects have these
+    // This step might vary depending on how you generate `availableCurrencies`.
+    // We'll do a sample check if you know which currency is definitely there:
+    cy.get('select').first().select('ATOM')
+    cy.get('select').last().select('ETH')
   })
 
-  it('filters tasks by category using intercept', () => {
-    cy.intercept('GET', '**/tasks', { fixture: 'tasks.json' }).as('getTasks')
-    cy.visit('/')
-    cy.wait('@getTasks')
+  it('performs a swap and displays result in the SwapList', () => {
+    cy.wait('@getTokenPrices')
 
-    // Click the "Completed" category card.
-    cy.contains('Completed').click()
+    // Fill "From Currency"
+    cy.get('select').first().select('ATOM')
 
-    // Verify that only one task item is visible and that it contains the completed task title.
-    cy.get('[data-cy="task-item"]', { timeout: 10000 })
-      .should('have.length', 1)
-      .first()
-      .should('contain.text', 'Completed Task')
+    // Fill "Amount to send"
+    cy.get('#input-amount').type('10')
+
+    // Fill "To Currency"
+    cy.get('select').last().select('ETH')
+
+    // Confirm swap
+    cy.contains('button', 'CONFIRM SWAP').click()
+
+    // Now check that a new swap item is displayed in the list.
+    // Assuming your SwapList items have a data-cy or some unique attribute.
+    // Or we can just check text:
+    cy.contains('10 ATOM')   // from side
+    cy.contains(' ETH')      // to side
+
+    // Optionally check the computed toAmount if you know your fixture's prices (e.g. 10 ATOM → X ETH)
+    // e.g. if 1 ATOM = $10, 1 ETH = $2000 => toAmount= $100 / $2000 = 0.05
+    cy.contains('0.05 ETH')
   })
 
-  it('filters tasks based on search query and shows no tasks if none match', () => {
-    // Type in the search bar.
-    cy.get('input[placeholder="Search tasks..."]').type('Test')
+  it('shows error card if the token prices fail to load', () => {
+    // Override the intercept to return a 500 error
+    cy.intercept('GET', 'http://localhost:3000/tokenPrices', {
+      statusCode: 500,
+      body: {},
+    }).as('getTokenPricesFail')
 
-    // Verify that no task items are rendered.
-    cy.get('[data-cy="task-item"]', { timeout: 10000 }).should('have.length', 0)
-  })
+    // Visit again to trigger the failing request
+    cy.visit('http://localhost:4173/')
+    cy.wait('@getTokenPricesFail')
 
-  it('filters tasks based on search query', () => {
-    // Type in the search bar.
-    cy.get('input[placeholder="Search tasks..."]').type('Task')
+    // The error card should appear
+    cy.contains('Could not load token prices at the moment.').should('be.visible')
 
-    // Verify that every visible task contains "Test" in its title.
-    cy.get('body').then(($body) => {
-      const items = $body.find('[data-cy="task-item"]')
-      if (items.length > 0) {
-        cy.wrap(items).each(($el) => {
-          cy.wrap($el).should('contain.text', 'Task')
-        })
-      } else {
-        expect(items.length).to.equal(0)
-      }
-    })
-  })
-
-  it('creates a new task', () => {
-    // Use the test attribute to find the button
-    cy.get('[data-cy="add-task-button"]').click()
-
-    // Fill out the TaskForm in the modal.
-    cy.get('input#taskTitle').type('Cypress New Task')
-    cy.get('textarea#taskDescription').type('This task is created by Cypress.')
-    cy.get('select#taskPriority').select('High')
-
-    // Click on a color box; adjust the selector to reliably find the color.
-    cy.get('div')
-      .filter((index, el) => el.style.backgroundColor.includes('rgb(242, 153, 74)'))
-      .first()
-      .click()
-
-    cy.contains('Save').click()
-    // Verify the new task appears in the list.
-    cy.contains('Cypress New Task').should('be.visible')
-  })
-
-  it('updates an existing task', () => {
-    // For testing, click on the first task item (using the data-cy attribute) to open the update modal.
-    cy.get('[data-cy="task-item"]').first().click()
-    // Clear and update the task title.
-    cy.get('input#taskTitle').clear()
-    cy.get('input#taskTitle').type('Updated Task Title')
-    cy.contains('Save').click()
-    // Verify the updated title appears in the task list.
-    cy.contains('Updated Task Title').should('be.visible')
+    // The form should not appear
+    cy.get('form').should('not.exist')
   })
 })
